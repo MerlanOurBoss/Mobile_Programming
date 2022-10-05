@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "611853701797",
+    "firebase_url": "https://android-mobile-programmi-63ac7-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "android-mobile-programmi-63ac7",
+    "storage_bucket": "android-mobile-programmi-63ac7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:611853701797:android:6fe84ee15a3b86dc4e734c",
+        "android_client_info": {
+          "package_name": "com.example.instagramclone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "611853701797-cbjmua4g2kn18q8uklkabcg1disj45ds.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkInLxfByWMA2jM4DtOQEGY1LDNiJTUBE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "611853701797-cbjmua4g2kn18q8uklkabcg1disj45ds.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
