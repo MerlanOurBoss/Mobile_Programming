@@ -28,10 +28,10 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@drawable/button_background"
-            android:text="Register"
+            android:text="Log In"
             android:shadowColor="@color/colorBlack"
             android:textAllCaps="false"
-            android:id="@+id/register"/>
+            android:id="@+id/login"/>
 
         <View
             android:layout_width="0dp"
@@ -42,10 +42,10 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@drawable/button_background"
-            android:text="Log In"
+            android:text="Register"
             android:shadowColor="@color/colorBlack"
             android:textAllCaps="false"
-            android:id="@+id/login"/>
+            android:id="@+id/register"/>
 
     </LinearLayout>
 </RelativeLayout>
