@@ -25,7 +25,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
-                    android:src="@drawable/ic_close_background"
+                    android:src="@drawable/ic_close"
                     android:id="@+id/close"/>
                 <TextView
                     android:layout_width="wrap_content"
@@ -53,8 +53,15 @@
                 android:scaleType="centerInside"
                 android:src="@mipmap/ic_launcher"
                 android:id="@+id/image_added"/>
-            <AutoCompleteTextView
-                android:layout_width=""
-                android:layout_height=""
+            <com.hendraanggrian.appcompat.widget.SocialAutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:hint="Description..."
+                android:maxLines="5"
+                android:id="@+id/description"
+                app:socialFlags="hashtag|mention"
+                app:hashtagColor="@color/colorPrimary"
+                app:mentionColor="@color/colorPrimary"/>
         </LinearLayout>
 </LinearLayout>

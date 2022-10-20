@@ -2,6 +2,14 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         google()
+        jcenter()
+        jcenter() {
+            content {
+                includeModule("com.theartofdev.edmodo", "android-image-cropper")
+            }
+
+        }
+
         mavenCentral()
     }
 }
@@ -10,6 +18,12 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        jcenter()
+        jcenter() {
+            content {
+                includeModule("com.theartofdev.edmodo", "android-image-cropper")
+            }
+        }
     }
 }
 rootProject.name = "Instagram clone"
