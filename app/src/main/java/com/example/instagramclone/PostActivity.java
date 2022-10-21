@@ -102,7 +102,7 @@ public class PostActivity extends AppCompatActivity {
 
                     ref.child(postId).setValue(map);
 
-                    DatabaseReference mHashTagRef = FirebaseDatabase.getInstance().getReference().child("HashTag");
+                    DatabaseReference mHashTagRef = FirebaseDatabase.getInstance().getReference().child("HashTags");
                     List<String> hashTags = description.getHashtags();
                     if(!hashTags.isEmpty()){
                         for(String tag : hashTags){

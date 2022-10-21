@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.instagramclone.Adapter.TagAdapter;
 import com.example.instagramclone.Adapter.UserAdapter;
 import com.example.instagramclone.Model.User;
 import com.example.instagramclone.R;
@@ -35,6 +36,11 @@ public class SearchFragment extends Fragment {
     private SocialAutoCompleteTextView search_bar;
     private List<User> mUsers;
     private UserAdapter userAdapter;
+
+    private RecyclerView recyclerViewTags;
+    private List<String> mHashTags;
+    private List<String> mHashTagsCount;
+    private TagAdapter tagAdapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -43,6 +49,17 @@ public class SearchFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view_users);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        recyclerViewTags = view.findViewById(R.id.recycler_view_tags);
+        recyclerViewTags.setHasFixedSize(true);
+        recyclerViewTags.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        mHashTags = new ArrayList<>();
+        mHashTagsCount = new ArrayList<>();
+        tagAdapter = new TagAdapter(getContext(),mHashTags,mHashTagsCount);
+        recyclerViewTags.setAdapter(tagAdapter);
+
+
         mUsers = new ArrayList<>();
         userAdapter = new UserAdapter(getContext(), mUsers, true);
 
@@ -50,6 +67,7 @@ public class SearchFragment extends Fragment {
         search_bar =view.findViewById(R.id.search_bar);
 
         readUsers();
+        readTags();
         search_bar.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -68,6 +86,28 @@ public class SearchFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void readTags() {
+        FirebaseDatabase.getInstance().getReference().child("HashTags").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mHashTags.clear();
+                mHashTagsCount.clear();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    mHashTags.add(snapshot.getKey());
+                    mHashTagsCount.add(snapshot.getChildrenCount() + "");
+                }
+
+                tagAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void readUsers() {
