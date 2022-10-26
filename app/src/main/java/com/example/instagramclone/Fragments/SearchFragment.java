@@ -28,6 +28,7 @@ import com.hendraanggrian.appcompat.widget.SocialAutoCompleteTextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class SearchFragment extends Fragment {
 
@@ -81,7 +82,7 @@ public class SearchFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                 filter(s.toString());
             }
         });
 
@@ -153,5 +154,19 @@ public class SearchFragment extends Fragment {
 
             }
         });
+    }
+
+    private void filter (String text){
+        List<String> mSearchTags = new ArrayList<>();
+        List<String> mSearchTagsCount = new ArrayList<>();
+
+        for (String s : mHashTags){
+            if (s.toLowerCase().contains(text.toLowerCase())){
+                mSearchTags.add(s);
+                mSearchTagsCount.add(mHashTagsCount.get(mHashTags.indexOf(s)));
+            }
+        }
+
+        tagAdapter.filter(mSearchTags,mSearchTagsCount);
     }
 }
