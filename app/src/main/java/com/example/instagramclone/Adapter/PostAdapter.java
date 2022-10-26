@@ -1,6 +1,7 @@
 package com.example.instagramclone.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.instagramclone.CommentActivity;
 import com.example.instagramclone.Model.Post;
 import com.example.instagramclone.Model.User;
 import com.example.instagramclone.R;
@@ -21,6 +23,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hendraanggrian.appcompat.widget.SocialTextView;
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -72,6 +76,44 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder>{
 
             }
         });
+
+        isLiked(post.getPostid(), holder.like);
+        noOfLikes(post.getPostid(), holder.noOfLikes);
+        getComments(post.getPostid(), holder.noOfComments);
+
+        holder.like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (holder.like.getTag().equals("like")) {
+                    FirebaseDatabase.getInstance().getReference().child("Likes")
+                            .child(post.getPostid()).child(firebaseUser.getUid()).setValue(true);
+
+                } else {
+                    FirebaseDatabase.getInstance().getReference().child("Likes")
+                            .child(post.getPostid()).child(firebaseUser.getUid()).removeValue();
+                }
+            }
+        });
+
+        holder.comment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, CommentActivity.class);
+                intent.putExtra("postId", post.getPostid());
+                intent.putExtra("authorId", post.getPublisher());
+                mContext.startActivity(intent);
+            }
+        });
+
+        holder.noOfComments.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, CommentActivity.class);
+                intent.putExtra("postId", post.getPostid());
+                intent.putExtra("authorId", post.getPublisher());
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -111,5 +153,53 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder>{
             description = itemView.findViewById(R.id.description);
 
         }
+    }
+
+    private void isLiked(String postId, ImageView imageView){
+        FirebaseDatabase.getInstance().getReference().child("Likes").child(postId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child(firebaseUser.getUid()).exists()){
+                    imageView.setImageResource(R.drawable.ic_liked);
+                    imageView.setTag("liked");
+                } else{
+                    imageView.setImageResource(R.drawable.ic_like);
+                    imageView.setTag("like");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void noOfLikes(String postId, TextView text){
+        FirebaseDatabase.getInstance().getReference().child("Likes").child(postId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                text.setText(dataSnapshot.getChildrenCount() + " likes");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getComments (String postId, TextView text){
+        FirebaseDatabase.getInstance().getReference().child("Comments").child(postId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                text.setText("View All " + dataSnapshot.getChildrenCount()+ " Comments");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }
