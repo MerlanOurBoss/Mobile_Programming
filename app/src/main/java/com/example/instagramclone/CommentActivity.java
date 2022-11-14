@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
@@ -63,12 +64,16 @@ public class CommentActivity extends AppCompatActivity {
             }
         });
 
+        Intent intent = getIntent();
+        postId = intent.getStringExtra("postId");
+        authorId = intent.getStringExtra("authorId");
+
         recyclerView = findViewById(R.id.recycle_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         commentList = new ArrayList<>();
-        commentAdapter = new CommentAdapter(this, commentList);
+        commentAdapter = new CommentAdapter(this, commentList,postId);
 
         recyclerView.setAdapter(commentAdapter);
 
@@ -76,9 +81,6 @@ public class CommentActivity extends AppCompatActivity {
         imageProfile = findViewById(R.id.image_profile);
         post = findViewById(R.id.post);
 
-        Intent intent = getIntent();
-        postId = intent.getStringExtra("postId");
-        authorId = intent.getStringExtra("authorId");
 
         fUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -95,10 +97,10 @@ public class CommentActivity extends AppCompatActivity {
             }
         });
 
-        getCommets();
+        getComment();
     }
 
-    private void getCommets() {
+    private void getComment() {
 
         FirebaseDatabase.getInstance().getReference().child("Comments").child(postId).addValueEventListener(new ValueEventListener() {
             @Override
@@ -122,11 +124,18 @@ public class CommentActivity extends AppCompatActivity {
 
     private void putComment() {
         HashMap<String, Object> map = new HashMap<>();
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Comments").child(postId);
+
+        String id = ref.push().getKey();
+
+        map.put("id", id);
         map.put("comment", addComment.getText().toString());
         map.put("publisher", fUser.getUid());
+
+        addComment.setText("");
         
-        FirebaseDatabase.getInstance().getReference().child("Comments").child(postId)
-                .push().setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+        ref.child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
