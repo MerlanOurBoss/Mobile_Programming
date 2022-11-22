@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.instagramclone.Adapter.PhotoAdapter;
+import com.example.instagramclone.EditProfileActivity;
 import com.example.instagramclone.Model.Post;
 import com.example.instagramclone.Model.User;
 import com.example.instagramclone.R;
@@ -111,7 +112,7 @@ public class ProfileFragment extends Fragment {
                 String btnText = editProfile.getText().toString();
 
                 if (btnText.equals("Edit profile")) {
-                   // startActivity(new Intent(getContext(), EditProfileActivity.class));
+                    startActivity(new Intent(getContext(), EditProfileActivity.class));
                 } else {
                     if (btnText.equals("follow")) {
                         FirebaseDatabase.getInstance().getReference().child("Follow").child(fUser.getUid())
