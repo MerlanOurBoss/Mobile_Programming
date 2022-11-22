@@ -10,13 +10,14 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.instagramclone.Fragments.PostDetailFragment;
 import com.example.instagramclone.Model.Post;
 import com.example.instagramclone.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> {
+public class  PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> {
 
     private Context mContext;
     private List<Post> mPosts;
@@ -39,15 +40,15 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
         final Post post = mPosts.get(position);
         Picasso.get().load(post.getImageurl()).placeholder(R.mipmap.ic_launcher).into(holder.postImage);
 
-//        holder.postImage.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit().putString("postid", post.getPostid()).apply();
-//
-//                ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.fragment_container, new PostDetailFragment()).commit();
-//            }
-//        });
+        holder.postImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit().putString("postid", post.getPostid()).apply();
+
+                ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new PostDetailFragment()).commit();
+            }
+        });
 
     }
 
