@@ -18,8 +18,10 @@ import android.widget.TextView;
 
 import com.example.instagramclone.Adapter.PhotoAdapter;
 import com.example.instagramclone.EditProfileActivity;
+import com.example.instagramclone.FollowersActivity;
 import com.example.instagramclone.Model.Post;
 import com.example.instagramclone.Model.User;
+import com.example.instagramclone.OptionsActivity;
 import com.example.instagramclone.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -131,7 +133,35 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        followers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), FollowersActivity.class);
+                intent.putExtra("id", profileId);
+                intent.putExtra("title", "followers");
+                startActivity(intent);
 
+            }
+        });
+
+        following.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), FollowersActivity.class);
+                intent.putExtra("id", profileId);
+
+                intent.putExtra("title", "followings");
+                startActivity(intent);
+
+            }
+        });
+
+        options.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getContext(), OptionsActivity.class));
+            }
+        });
 
         return view;
     }
