@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.instagramclone.CommentActivity;
+import com.example.instagramclone.FollowersActivity;
 import com.example.instagramclone.Fragments.PostDetailFragment;
 import com.example.instagramclone.Fragments.ProfileFragment;
 import com.example.instagramclone.Model.Post;
@@ -174,6 +175,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder>{
 
                 ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, new PostDetailFragment()).commit();
+            }
+        });
+
+        holder.noOfLikes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent =new Intent(mContext, FollowersActivity.class);
+                intent.putExtra("id", post.getPublisher());
+                intent.putExtra("title", "likes");
+                mContext.startActivity(intent);
             }
         });
     }

@@ -50,6 +50,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         Notification notification = mNotifications.get(position);
 
         getUser(holder.imageProfile, holder.username, notification.getUserid());
+        holder.comment.setText(notification.getText());
 
         if (notification.isPost()){
             holder.postImage.setVisibility(View.VISIBLE);
