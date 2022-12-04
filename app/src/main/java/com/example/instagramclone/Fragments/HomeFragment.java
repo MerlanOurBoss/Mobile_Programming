@@ -13,11 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.instagramclone.Adapter.PostAdapter;
+import com.example.instagramclone.Adapter.StoryAdapter;
 import com.example.instagramclone.Model.Post;
+import com.example.instagramclone.Model.Story;
 import com.example.instagramclone.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
@@ -30,6 +33,10 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerViewPosts;
     private PostAdapter postAdapter;
     private List<Post> postList;
+
+    private RecyclerView recyclerView_story;
+    private StoryAdapter storyAdapter;
+    private List<Story> storyList;
 
     private List<String> followingList;
     @Override
@@ -50,6 +57,17 @@ public class HomeFragment extends Fragment {
         recyclerViewPosts.setAdapter(postAdapter);
         followingList = new ArrayList<>();
 
+        recyclerView_story = view.findViewById(R.id.recycler_view_story);
+        recyclerView_story.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager1 = new LinearLayoutManager(getContext(),
+                LinearLayoutManager.HORIZONTAL, false);
+        recyclerView_story.setLayoutManager(linearLayoutManager1);
+        storyList = new ArrayList<>();
+        storyAdapter = new StoryAdapter(getContext(), storyList);
+        recyclerView_story.setAdapter(storyAdapter);
+
+
+
         checkFollowingUsers();
 
         return view;
@@ -67,6 +85,7 @@ public class HomeFragment extends Fragment {
                 followingList.add(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
                 readPosts();
+                readStory();
             }
 
             @Override
@@ -101,5 +120,37 @@ public class HomeFragment extends Fragment {
             }
         });
 
+    }
+
+    private void readStory(){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                long timecurrent = System.currentTimeMillis();
+                storyList.clear();
+                storyList.add(new Story("", 0,0,"",
+                        FirebaseAuth.getInstance().getUid()));
+                for (String id: followingList){
+                    int countStory = 0;
+                    Story story = null;
+                    for (DataSnapshot snapshot: dataSnapshot.child(id).getChildren()){
+                        story = snapshot.getValue(Story.class);
+                        if (timecurrent > story.getTimestart() && timecurrent < story.getTimeend()){
+                            countStory++;
+                        }
+                    }
+                    if (countStory > 0){
+                        storyList.add(story);
+                    }
+                }
+                storyAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }
