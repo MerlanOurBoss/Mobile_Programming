@@ -7,12 +7,14 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -41,8 +43,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ProfileFragment extends Fragment {
 
     private RecyclerView recyclerView;
+    private RecyclerView recyclerView_saves;
     private PhotoAdapter photoAdapter;
     private List<Post> myPhotoList;
+
+    private List<String> mySaves;
 
     private CircleImageView imageProfile;
     private ImageView options;
@@ -53,13 +58,15 @@ public class ProfileFragment extends Fragment {
     private TextView bio;
     private TextView username;
 
-    private ImageView myPictures;
-    private ImageView savedPictures;
+    private ImageButton myPictures;
+    private ImageButton savedPictures;
 
     private Button editProfile;
 
     private FirebaseUser fUser;
 
+    private List<Post> postList_saves;
+    private PhotoAdapter myFotosAdapter_saves;
     String profileId;
 
 
@@ -97,16 +104,27 @@ public class ProfileFragment extends Fragment {
         myPhotoList = new ArrayList<>();
         photoAdapter = new PhotoAdapter(getContext(), myPhotoList);
         recyclerView.setAdapter(photoAdapter);
+        recyclerView.setVisibility(View.VISIBLE);
+
+        recyclerView_saves = view.findViewById(R.id.recucler_view_saved);
+        recyclerView_saves.setHasFixedSize(true);
+        recyclerView_saves.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        postList_saves = new ArrayList<>();
+        myFotosAdapter_saves = new PhotoAdapter(getContext(), postList_saves);
+        recyclerView_saves.setVisibility(View.GONE);
+        recyclerView_saves.setAdapter(myFotosAdapter_saves);
 
         userInfo();
         getFollowersAndFollowingCount();
         getPostCount();
         myPhotos();
+        mySaves();
 
         if (profileId.equals(fUser.getUid())) {
             editProfile.setText("Edit profile");
         } else {
             checkFollowingStatus();
+            savedPictures.setVisibility(View.GONE);
         }
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,6 +159,22 @@ public class ProfileFragment extends Fragment {
                 intent.putExtra("title", "followers");
                 startActivity(intent);
 
+            }
+        });
+
+        myPictures.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recyclerView.setVisibility(View.VISIBLE);
+                recyclerView_saves.setVisibility(View.GONE);
+            }
+        });
+
+        savedPictures.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recyclerView.setVisibility(View.GONE);
+                recyclerView_saves.setVisibility(View.VISIBLE);
             }
         });
 
@@ -271,7 +305,12 @@ public class ProfileFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
 
-                Picasso.get().load(user.getImageurl()).into(imageProfile);
+                Picasso.get().load(user.getImageurl()).placeholder(R.mipmap.ic_launcher).into(imageProfile);
+//                if (user.getImageurl().equals("default")){
+//                    holder.imageProfile.setImageResource(R.mipmap.ic_launcher);
+//                } else {
+//                    Picasso.get().load(user.getImageurl()).placeholder(R.mipmap.ic_launcher).into(holder.imageProfile);
+//                }
                 username.setText(user.getUsername());
                 fullname.setText(user.getName());
                 bio.setText(user.getBio());
@@ -279,6 +318,51 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
+    private void mySaves(){
+        mySaves = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Saves").child(fUser.getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    mySaves.add(snapshot.getKey());
+                }
+                readSaves();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void readSaves(){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                postList_saves.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Post post = snapshot.getValue(Post.class);
+
+                    for (String id : mySaves) {
+                        if (post.getPostid().equals(id)) {
+                            postList_saves.add(post);
+                        }
+                    }
+                }
+                myFotosAdapter_saves.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });

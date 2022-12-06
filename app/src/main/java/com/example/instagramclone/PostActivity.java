@@ -147,7 +147,7 @@ public class PostActivity extends AppCompatActivity {
 
         if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK){
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            imageUri =result.getUri();
+            imageUri = result.getUri();
 
             imageAdded.setImageURI(imageUri);
         }else{
