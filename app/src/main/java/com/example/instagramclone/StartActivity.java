@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -57,17 +58,20 @@ public class StartActivity extends AppCompatActivity {
                 return true;
             }
         });
-
         Bundle intent = getIntent().getExtras();
-        if (intent != null) {
-            String profileId = intent.getString("publisherId");
+        if (intent != null){
+            String publisher = intent.getString("publisherid");
 
-            getSharedPreferences("PROFILE", MODE_PRIVATE).edit().  putString("profileId", profileId).apply();
+            SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
+            editor.putString("profileid", publisher);
+            editor.apply();
 
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
-            bottomNavigationView.setSelectedItemId(R.id.nav_profile);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    new ProfileFragment()).commit();
         } else {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container , new HomeFragment()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    new HomeFragment()).commit();
         }
+
     }
 }

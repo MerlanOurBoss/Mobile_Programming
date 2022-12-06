@@ -2,14 +2,14 @@ package com.example.instagramclone.Model;
 
 public class Story {
 
-    private String imageUrl;
+    private String imageurl;
     private long timestart;
     private long timeend;
     private String storyid;
     private String userid;
 
-    public Story(String imageUrl, long timestart, long timeend, String storyid, String userid) {
-        this.imageUrl = imageUrl;
+    public Story(String imageurl, long timestart, long timeend, String storyid, String userid) {
+        this.imageurl = imageurl;
         this.timestart = timestart;
         this.timeend = timeend;
         this.storyid = storyid;
@@ -20,11 +20,11 @@ public class Story {
     }
 
     public String getImageurl() {
-        return imageUrl;
+        return imageurl;
     }
 
     public void setImageurl(String imageurl) {
-        this.imageUrl = imageurl;
+        this.imageurl = imageurl;
     }
 
     public long getTimestart() {

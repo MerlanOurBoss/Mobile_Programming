@@ -17,6 +17,7 @@ import com.example.instagramclone.Adapter.UserAdapter;
 import com.example.instagramclone.Model.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
@@ -75,6 +76,10 @@ public class FollowersActivity extends AppCompatActivity {
             case "likes":
                 getLikes();
                 break;
+
+            case "views":
+                getViews();
+                 break;
         }
     }
 
@@ -118,6 +123,27 @@ public class FollowersActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void getViews(){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story")
+                .child(id).child(getIntent().getStringExtra("storyid")).child("views");
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                idList.clear();
+                for(DataSnapshot snapshot : dataSnapshot.getChildren() ){
+                    idList.add(snapshot.getKey());
+                }
+                showUsers();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void getLikes() {

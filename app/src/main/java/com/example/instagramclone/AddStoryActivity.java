@@ -27,62 +27,58 @@ import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 
-import java.net.URL;
 import java.util.HashMap;
 
 public class AddStoryActivity extends AppCompatActivity {
 
 
     private Uri mImageUri;
-    String myUrl = "";
-                                                                                                                                                                                                                                private StorageTask storageTask;
-    StorageReference storageReference;
+    String miUrlOk = "";
+    private StorageTask uploadTask;
+    StorageReference storageRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_story);
 
-        storageReference = FirebaseStorage.getInstance().getReference("story");
+        storageRef = FirebaseStorage.getInstance().getReference("story");
 
         CropImage.activity()
                 .setAspectRatio(9,16)
                 .start(AddStoryActivity.this);
+
     }
 
     private String getFileExtension(Uri uri){
-        ContentResolver contentResolver = getContentResolver();
-        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
-        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+        ContentResolver cR = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cR.getType(uri));
     }
 
-    private void publishStory(){
-        ProgressDialog pd = new ProgressDialog(this);
+    private void uploadImage_10(){
+        final ProgressDialog pd = new ProgressDialog(this);
         pd.setMessage("Posting");
-
         pd.show();
+        if (mImageUri != null){
+            final StorageReference fileReference = storageRef.child(System.currentTimeMillis()
+                    + "." + getFileExtension(mImageUri));
 
-        if(mImageUri != null){
-            StorageReference imageReference = storageReference.child(System.currentTimeMillis()
-                + "." + getFileExtension(mImageUri));
-
-            storageTask = imageReference.putFile(mImageUri);
-            storageTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>()  {
+            uploadTask = fileReference.putFile(mImageUri);
+            uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
                 public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                    if (!task.isSuccessful()){
+                    if (!task.isSuccessful()) {
                         throw task.getException();
                     }
-
-                    return imageReference.getDownloadUrl();
+                    return fileReference.getDownloadUrl();
                 }
             }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                 @Override
                 public void onComplete(@NonNull Task<Uri> task) {
-                    if (task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
-                        myUrl = downloadUri.toString();
-
+                        miUrlOk = downloadUri.toString();
 
                         String myid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -90,21 +86,23 @@ public class AddStoryActivity extends AppCompatActivity {
                                 .child(myid);
 
                         String storyid = reference.push().getKey();
-                        long timeend = System.currentTimeMillis() + 86400000; //1 day
+                        long timeend = System.currentTimeMillis()+86400000; // 1 day later
 
                         HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("imageurl", myUrl);
+                        hashMap.put("imageurl", miUrlOk);
                         hashMap.put("timestart", ServerValue.TIMESTAMP);
                         hashMap.put("timeend", timeend);
                         hashMap.put("storyid", storyid);
                         hashMap.put("userid", myid);
 
                         reference.child(storyid).setValue(hashMap);
+
                         pd.dismiss();
 
                         finish();
+
                     } else {
-                        Toast.makeText(AddStoryActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddStoryActivity.this, "Failed", Toast.LENGTH_SHORT).show();
                     }
                 }
             }).addOnFailureListener(new OnFailureListener() {
@@ -113,22 +111,26 @@ public class AddStoryActivity extends AppCompatActivity {
                     Toast.makeText(AddStoryActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
+
         } else {
-            Toast.makeText(AddStoryActivity.this, "No image selected!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddStoryActivity.this, "No image selected", Toast.LENGTH_SHORT).show();
         }
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode,resultCode,data);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK){
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
+
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             mImageUri = result.getUri();
 
-            publishStory();
+            uploadImage_10();
+
         } else {
             Toast.makeText(this, "Something gone wrong!", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(AddStoryActivity.this, StartActivity.class));
+            startActivity(new Intent(AddStoryActivity.this, MainActivity.class));
             finish();
         }
     }

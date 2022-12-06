@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hendraanggrian.appcompat.widget.SocialTextView;
@@ -82,6 +83,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder>{
             }
         });
 
+        isSaved(post.getPostid(), holder.save);
         isLiked(post.getPostid(), holder.like);
         noOfLikes(post.getPostid(), holder.noOfLikes);
         getComments(post.getPostid(), holder.noOfComments);
@@ -126,11 +128,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder>{
             @Override
             public void onClick(View v) {
                 if (holder.save.getTag().equals("save")){
-                    FirebaseDatabase.getInstance().getReference().child("Saves")
-                            .child(firebaseUser.getUid()).child(post.getPostid()).setValue(true);
+                    FirebaseDatabase.getInstance().getReference().child("Saves").child(firebaseUser.getUid())
+                            .child(post.getPostid()).setValue(true);
                 } else {
-                    FirebaseDatabase.getInstance().getReference().child("Saves")
-                            .child(firebaseUser.getUid()).child(post.getPostid()).removeValue();
+                    FirebaseDatabase.getInstance().getReference().child("Saves").child(firebaseUser.getUid())
+                            .child(post.getPostid()).removeValue();
                 }
             }
         });
@@ -243,6 +245,31 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.Viewholder>{
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void isSaved(final String postid, final ImageView imageView){
+
+        final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                .child("Saves").child(firebaseUser.getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child(postid).exists()){
+                    imageView.setImageResource(R.drawable.ic_save);
+                    imageView.setTag("saved");
+                } else{
+                    imageView.setImageResource(R.drawable.ic_save);
+                    imageView.setTag("save");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
